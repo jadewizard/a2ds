@@ -1,0 +1,27 @@
+body
+{
+    margin: auto;
+    background-image: url("texturse/sitebg.png");
+}
+#game
+{
+    margin-top: 50px;
+    border: 8px double;
+}
+
+#logo
+{
+    font-size: 65pt;
+    text-align: center;
+    margin-top: 50px;
+    font-family: 'VT323';
+    color: #0d1d2c;
+}
+
+#description
+{
+    text-align: center;
+    font-size: 18pt;
+    font-family: 'VT323';
+    color: #0d1d2c;
+}
