@@ -73,7 +73,7 @@ function playerObject()
 
         canvasContext.drawImage(playerImage, this.x, this.y);
 
-        if(iteration >= 4) iteration = 0; // zeroes iteration
+        if(iteration >= 3) iteration = 0; // zeroes iteration
     }
 
     this.userAction = function()
@@ -89,7 +89,7 @@ function playerObject()
                 ++shotCount;
                 shot.newShot(shotCount) // create new shot
 
-                console.log(shotCount);
+                if(shotCount >= 7){ shotCount = 0 } // zeroes shot counter
             }
 
             if(playerModel.x <= 0)
@@ -117,7 +117,6 @@ function shotObject()
     this.newShot = function(count)
     {
         playerShotsArray[count] = new shotObject();
-
         console.log(playerShotsArray);
     }
 
@@ -131,6 +130,11 @@ function shotObject()
     {
         playerShotsArray[i].y1 -= 5;
         playerShotsArray[i].y2 -= 5;
+
+        if(playerShotsArray[i].y1 <= 0 || playerShotsArray[i].y2 <= 0)
+        {
+            playerShotsArray[i] = undefined;
+        }
     }
 }
 
@@ -143,7 +147,10 @@ function gameUpdate()
 
     for(i = 1; i < playerShotsArray.length; i++)
     {
-        playerShotsArray[i].draw();
-        playerShotsArray[i].shotAction(i);
+        if(playerShotsArray[i] != undefined)
+        {
+            playerShotsArray[i].draw();
+            playerShotsArray[i].shotAction(i);
+        }
     }
 }
