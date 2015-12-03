@@ -18,12 +18,18 @@ function gameInitialization()
     graphicArray.player = "texturse/player";
     graphicArray.background = "texturse/space.png";
     graphicArray.playershot = "texturse/playershot.png";
+    graphicArray.heavyEnemy = "texturse/heavyEnemy";
 
     // INSTANCES CLASSES FOR GAME TEXTURSE
     gameBg = new gameBackground(); // new instance gameBackground
+    // PLAYER
     playerModel = new playerObject(); // new instance playerObject
-    shot = new shotObject(); // shot object
-    playerShotsArray = new Array(); // shots array
+    shot = new playerShotObject(); // shot object
+    playerShotsArray = new Array(); // player all shots array
+    // ENEMY
+    enemyArray = new Array();
+    enemy = new allEnemyObjects(); // new instance heavyEnemy
+    enemy.firstCreate();
 
     setInterval(gameUpdate, 60); // game updater
 }
@@ -76,7 +82,7 @@ function playerObject()
         if(iteration >= 3) iteration = 0; // zeroes iteration
     }
 
-    this.userAction = function()
+    this.action = function()
     {
         document.onkeydown = function(event)
         {
@@ -92,19 +98,19 @@ function playerObject()
                 if(shotCount >= 7){ shotCount = 0 } // zeroes shot counter
             }
 
-            if(playerModel.x <= 0)
+            if(this.x <= 0)
             {
-                playerModel.x = 568 // return in end
+                this.x = 568 // return in end
             }
-            else if(playerModel.x >= 600)
+            else if(this.x >= 600)
             {
-                playerModel.x = 0; // return in start
+                this.x = 0; // return in start
             }
         }
     }
 }
 
-function shotObject()
+function playerShotObject()
 {
     this.x1 = playerModel.x + 3;
     this.y1 = playerModel.y - 10;
@@ -116,7 +122,7 @@ function shotObject()
 
     this.newShot = function(count)
     {
-        playerShotsArray[count] = new shotObject();
+        playerShotsArray[count] = new playerShotObject();
         console.log(playerShotsArray);
     }
 
@@ -128,12 +134,45 @@ function shotObject()
 
     this.shotAction = function(i)
     {
-        playerShotsArray[i].y1 -= 5;
-        playerShotsArray[i].y2 -= 5;
+        this.y1 -= 5;
+        this.y2 -= 5;
 
-        if(playerShotsArray[i].y1 <= 0 || playerShotsArray[i].y2 <= 0)
+        if(this.y1 <= 0 || this.y2 <= 0)
         {
             playerShotsArray[i] = undefined;
+        }
+    }
+}
+
+function heavyEnemyObject()
+{
+    var iteration = 0;
+    this.x = rnd(50, 70); // enemy x
+    this.y = rnd(-20, -50); // enemy y
+    var heavyEnemyImage = new Image();
+
+    this.draw = function(drawIteration)
+    {
+        ++iteration;
+        heavyEnemyImage.src = graphicArray.heavyEnemy + iteration + ".png";
+        canvasContext.drawImage(heavyEnemyImage, this.x + drawIteration * 100, this.y);
+
+        if(iteration >= 4) iteration = 0; // zeroes iteration
+    }
+
+    this.enemyAction = function()
+    {
+        this.y += rnd(1, 3);
+    }
+}
+
+function allEnemyObjects()
+{
+    this.firstCreate = function()
+    {
+        for(i = 0; i < rnd(3, 6); i++)
+        {
+            enemyArray[i] = new heavyEnemyObject();
         }
     }
 }
@@ -142,8 +181,14 @@ function gameUpdate()
 {
     gameBg.draw();
     playerModel.draw();
-    playerModel.userAction();
+    playerModel.action();
     gameBg.backgroundAction();
+
+    for(z = 0; z < enemyArray.length; z++)
+    {
+        enemyArray[z].draw(z);
+        enemyArray[z].enemyAction();
+    }
 
     for(i = 1; i < playerShotsArray.length; i++)
     {
@@ -153,4 +198,9 @@ function gameUpdate()
             playerShotsArray[i].shotAction(i);
         }
     }
+}
+
+function rnd(min, max)
+{
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
