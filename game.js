@@ -1,6 +1,9 @@
-/**
- * Created by jade on 02.12.15.
- */
+/*
+* TODO
+* 0) Fixed stuck in FF
+* 1) Add enemy fire
+* 2) Add enemy & player clash handler
+* */
 
 window.onload = function() { gameInitialization(); } // functions for game initialization
 
@@ -12,6 +15,7 @@ function gameInitialization()
     canvas.height = 350; // game height
     canvasContext = canvas.getContext("2d"); // game context for draw
     shotCount = 0; // counter for shots
+    playerKillCounter = 0;
 
     // GAME GRAPHIC AND PHISICS
     graphicArray = new Object(); // assoc array for texture store
@@ -28,12 +32,15 @@ function gameInitialization()
     playerModel = new playerObject(); // new instance playerObject
     shot = new playerShotObject(); // shot object
     playerShotsArray = new Array(); // player all shots array
+    score = new playerScore();
     // ENEMY
     enemyArray = new Array();
     enemy = new allEnemyObjects(); // new instance heavyEnemy
     enemy.firstCreate();
 
-    setInterval(gameUpdate, 60); // game updater
+    setInterval(function(){
+        requestAnimationFrame(gameUpdate);
+    }, 60);
 }
 
 function gameBackground()
@@ -174,7 +181,7 @@ function heavyEnemyObject()
     this.y = rnd(-20, -50); // enemy y
     this.killCount = 0; // counter for killed ships. Start with 10 as previous elements are used
     var enemyImage = new Image();
-    
+
     this.draw = function(drawIteration)
     {
         ++iteration;
@@ -208,7 +215,8 @@ function heavyEnemyObject()
                         //console.log("[ENEMY] --- X === " + enemyArray[enemyIteration].x);
                         //console.log("[ENEMY] --- Y === " + (enemyArray[enemyIteration].y + 32));
 
-                        console.log(enemyArray.length);
+                        //console.log(enemyArray.length);
+                        ++playerKillCounter; // player kill ships inc counter!
 
                         if(this.killCount >= 15) {this.killCount = 0} // zeroes counter
                     }
@@ -224,6 +232,18 @@ function heavyEnemyObject()
         }
 
         enemy.reborn(); // reborn killed ships
+    }
+}
+
+function playerScore()
+{
+    this.x = 1;
+    this.y = 10;
+
+    this.draw = function()
+    {
+        canvasContext.fillStyle = "#fff";
+        canvasContext.fillText("SCORE: " + playerKillCounter, this.x, this.y);
     }
 }
 
@@ -258,6 +278,7 @@ function gameUpdate()
     playerModel.draw();
     playerModel.action();
     gameBg.backgroundAction();
+    score.draw(); // draw player score
 
     for(i = 1; i < playerShotsArray.length; i++)
     {
