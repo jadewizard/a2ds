@@ -16,6 +16,7 @@ function gameInitialization()
     canvasContext = canvas.getContext("2d"); // game context for draw
     shotCount = 0; // counter for shots
     playerKillCounter = 0;
+    game = new game();
 
     // GAME GRAPHIC AND PHISICS
     graphicArray = new Object(); // assoc array for texture store
@@ -41,6 +42,24 @@ function gameInitialization()
     setInterval(function(){
         requestAnimationFrame(gameUpdate);
     }, 60);
+
+    game.event();
+}
+
+function game()
+{
+    this.levelOffset = 100;
+    this.event = function()
+    {
+
+    }
+
+    this.level = function()
+    {
+        if(playerKillCounter > 1) { this.levelOffset = 70; }
+        if(playerKillCounter > 2) { this.levelOffset = 50; }
+        if(playerKillCounter > 1000) { this.levelOffset = 30; }
+    }
 }
 
 function gameBackground()
@@ -170,25 +189,28 @@ function heavyEnemyObject()
     var iteration = 0;
     var r = rnd(1, 2); // random game models
 
-    if(this.killCount == undefined) // first creation
+    if(playerKillCounter == 0) // first creation
     {
         this.x = 0; // enemy x
     }
     else // post.. create
     {
-        this.x = rnd(0, 500); // enemy x
+        this.x = rnd(-10, 500); // enemy x
     }
-    this.y = rnd(-20, -50); // enemy y
-    this.killCount = 0; // counter for killed ships. Start with 10 as previous elements are used
+    this.y = rnd(-40, -80); // enemy y
+
+    //this.killCount = 0; // counter for killed ships. Start with 10 as previous elements are used
     var enemyImage = new Image();
 
     this.draw = function(drawIteration)
     {
-        ++iteration;
-        enemyImage.src = graphicArray.enemy[r] + iteration + ".png";
-        canvasContext.drawImage(enemyImage, this.x + drawIteration * 100, this.y);
-
-        if(iteration >= 4) iteration = 0; // zeroes iteration
+        if(this.x + drawIteration * game.levelOffset < 550)
+        {
+            ++iteration;
+            enemyImage.src = graphicArray.enemy[r] + iteration + ".png";
+            canvasContext.drawImage(enemyImage, this.x + drawIteration * game.levelOffset, this.y);
+            if(iteration >= 4) iteration = 0; // zeroes iteration
+        }
     }
 
     this.enemyAction = function()
@@ -204,8 +226,8 @@ function heavyEnemyObject()
             {
                 if(enemyArray[enemyIteration] != undefined)
                 {
-                    if(playerShotsArray[i].x >= enemyArray[enemyIteration].x + enemyIteration * 100 &&
-                        playerShotsArray[i].x <= enemyArray[enemyIteration].x + enemyIteration * 100 + 32 &&
+                    if(playerShotsArray[i].x >= enemyArray[enemyIteration].x + enemyIteration * game.levelOffset &&
+                        playerShotsArray[i].x <= enemyArray[enemyIteration].x + enemyIteration * game.levelOffset + 32 &&
                         playerShotsArray[i].y <= enemyArray[enemyIteration].y && enemyArray[enemyIteration].y >= 10)
                     {
                         enemyArray[enemyIteration] = undefined;
@@ -279,6 +301,7 @@ function gameUpdate()
     playerModel.action();
     gameBg.backgroundAction();
     score.draw(); // draw player score
+    game.level();
 
     for(i = 1; i < playerShotsArray.length; i++)
     {
