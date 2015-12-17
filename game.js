@@ -189,15 +189,15 @@ function heavyEnemyObject()
     var iteration = 0;
     var r = rnd(1, 2); // random game models
 
-    if(playerKillCounter == 0) // first creation
+    if(enemy.firstValue == false) // first creation
     {
         this.x = 0; // enemy x
     }
     else // post.. create
     {
-        this.x = rnd(-10, 500); // enemy x
+        this.x = rnd(-50, 100); // enemy x
     }
-    this.y = rnd(-40, -80); // enemy y
+    this.y = rnd(-40, -120); // enemy y
 
     //this.killCount = 0; // counter for killed ships. Start with 10 as previous elements are used
     var enemyImage = new Image();
@@ -208,7 +208,7 @@ function heavyEnemyObject()
         {
             ++iteration;
             enemyImage.src = graphicArray.enemy[r] + iteration + ".png";
-            canvasContext.drawImage(enemyImage, this.x + drawIteration * game.levelOffset, this.y);
+            canvasContext.drawImage(enemyImage, (this.x + drawIteration * game.levelOffset) + 10, this.y);
             if(iteration >= 4) iteration = 0; // zeroes iteration
         }
     }
@@ -221,13 +221,13 @@ function heavyEnemyObject()
     this.dead = function(enemyIteration)
     {
         for(i = 1; i < playerShotsArray.length; i++)
-        {
+        {this.firstValue = true;
             if(playerShotsArray[i] != undefined)
             {
                 if(enemyArray[enemyIteration] != undefined)
                 {
-                    if(playerShotsArray[i].x >= enemyArray[enemyIteration].x + enemyIteration * game.levelOffset &&
-                        playerShotsArray[i].x <= enemyArray[enemyIteration].x + enemyIteration * game.levelOffset + 32 &&
+                    if(playerShotsArray[i].x >= (enemyArray[enemyIteration].x + enemyIteration * game.levelOffset) + 10 &&
+                        playerShotsArray[i].x <= (enemyArray[enemyIteration].x + enemyIteration * game.levelOffset + 32) + 10 &&
                         playerShotsArray[i].y <= enemyArray[enemyIteration].y && enemyArray[enemyIteration].y >= 10)
                     {
                         enemyArray[enemyIteration] = undefined;
@@ -252,7 +252,6 @@ function heavyEnemyObject()
         {
             enemyArray[enemyIteration] = undefined;
         }
-
         enemy.reborn(); // reborn killed ships
     }
 }
@@ -272,12 +271,16 @@ function playerScore()
 function allEnemyObjects()
 {
     this.enemyIteration = 0;
+    this.firstValue = false;
+
     this.firstCreate = function()
     {
         for(i = 1; i < rnd(3, 6) + 1; i++)
         {
+            console.log(i);
             enemyArray[i] = new heavyEnemyObject();
         }
+        this.firstValue = true;
         //console.log("ENEMY === " + (enemyArray[1].x * 2 + 32));
     }
 
@@ -291,6 +294,12 @@ function allEnemyObjects()
                 break;
             }
         }
+    }
+
+    this.addShips = function()
+    {
+        arraySize = enemyArray.length; // size enemy array
+        enemyArray[arraySize + 1] = new heavyEnemyObject();
     }
 }
 
